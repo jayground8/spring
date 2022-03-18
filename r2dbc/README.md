@@ -126,3 +126,19 @@ Spring Web MVC에서도 Flux, Mono를 handle할 수 있도록 되어 있다. rea
 [6]: https://www.amazon.com/Hands-Reactive-Programming-Spring-cloud-ready-ebook/dp/B076QCBXZ2
 
 [7]: https://www.codetd.com/en/article/12228335
+
+## 참고자료
+
+1: https://technology.amis.nl/software-development/performance-and-tuning/spring-blocking-vs-non-blocking-r2dbc-vs-jdbc-and-webflux-vs-web-mvc/
+
+2: https://github.com/pgjdbc/r2dbc-postgresql
+
+3: https://github.com/mirromutth/r2dbc-mysql
+
+4: https://github.com/spring-projects/spring-framework/blob/main/spring-webmvc/src/main/java/org/springframework/web/servlet/mvc/method/annotation/ReactiveTypeHandler.java
+
+5: https://www.baeldung.com/spring-mvc-sse-streams
+
+6: https://www.amazon.com/Hands-Reactive-Programming-Spring-cloud-ready-ebook/dp/B076QCBXZ2
+
+7: https://www.codetd.com/en/article/12228335
