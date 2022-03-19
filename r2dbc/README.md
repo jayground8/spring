@@ -248,8 +248,6 @@ public interface Subscriber<T> {
 }
 ```
 
-앞서 MySQL과 Postgresql의 R2DBC driver에서 `ReactorNettyClient` class를 확인하였다. 이제 Database으로부터 데이터를 `BackendMessageSubscriber`를 통해서 받게 되는데, upstream에 request의 n이 1로 고정되어 있는 것을 debugging tool로 확인 할 수 있었다. `Spring Web MVC`에서 Webflux의 WebClient를 사용할 때의 다이어그램을 보면 request(1)로 나와있다.<sup>[7][7]</sup> `Spring Web MVC`에서 stream처럼 취급하여 request(1)로 하나씩 가져오도록 된 것으로 이해된다.
-
 Database에 `Select`를 하면 Database는 해당 Query에 대한 데이터를 검색하고 전달하게 된다. Protocol을 통해서 해당 데이터를 패킷으로 보내고, R2DBC driver에서 user space에서 얼마나 읽을지 정한다. 필요가 없으면 이제 kernel space에 있는 data는 그냥 버려질 수 있다. 이렇게 버려지는 데이터가 없이 Database에서 request한 데이터만 받아오도록 하려면 Postgresql에서는 portal같은 cursor기능을 활용해야 되는 것 같다. (하지만 Database와 명령을 더 주고 받아야 하기 때문에 response time은 증가하지 않을까?)
 
 ## 결론
