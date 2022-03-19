@@ -2,6 +2,9 @@ package com.example.demo
 
 import com.github.javafaker.Faker
 import io.r2dbc.spi.ConnectionFactory
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.CommandLineRunner
@@ -13,14 +16,17 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.r2dbc.repository.R2dbcRepository
 import org.springframework.data.relational.core.mapping.Table
+import org.springframework.http.MediaType
 import org.springframework.r2dbc.connection.init.CompositeDatabasePopulator
 import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer
 import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator
 import org.springframework.stereotype.Repository
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 import reactor.core.publisher.Flux
 import reactor.core.scheduler.Schedulers
+import java.util.concurrent.Executors
 
 
 fun generateFakeData(n: Int) : MutableList<Cat> {
@@ -76,7 +82,22 @@ class RestController(var catRepository: CatRepository) {
 		return catRepository
 				.getLimit()
 				.subscribeOn(Schedulers.boundedElastic())
-				.buffer().blockLast()
+				.buffer()
+				.map{
+					println(Thread.currentThread().name)
+					it
+				}.blockLast()
+	}
+
+	@GetMapping("/flux")
+	fun getFlux() : Flux<Cat> {
+		return catRepository.findAll().take(5)
+	}
+
+	@GetMapping("/emitter")
+	fun getEmitter() = ResponseBodyEmitter().apply {
+		this.send("hello world!")
+		this.complete()
 	}
 }
 
