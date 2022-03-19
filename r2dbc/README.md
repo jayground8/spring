@@ -256,9 +256,9 @@ Database에 `Select`를 하면 Database는 해당 Query에 대한 데이터를 �
 
 JDBC의 경우 worker thread pool이 saturated되면 queue에 쌓여서 기다려야 한다. 따라서 Controller에서 Flux나 Mono를 리턴하도록 작성하여 테스트한 결과라면 Async Controller로 작동하여 worker thread가 반환될 수 있고, 그렇기 때문에 Database data를 받느라 thread가 blocking되는 것보다 좋은 성능 결과가 나올 수 있었을거라 생각했을 것이다. 
 
-하지만 `Spring Web MVC + JDBC database driver`와 `Spring Web MVC + R2DBC driver`의 Performance 비교 글<sup>[1][1]</sup>에서는 `Flux.buffer().blockLast()`으로 작성하여 테스트를 하고 있다. 따라서 request를 처리하는 worker thread가 동일하게 blocking 될 것이고, 위와 같은 기대를 할 수가 없다.
+하지만 `Spring Web MVC + JDBC database driver`와 `Spring Web MVC + R2DBC driver`의 Performance 비교 글<sup>[1][1]</sup>에서는 `Flux.buffer().blockLast()`으로 작성하여 테스트를 하고 있다. 따라서 request를 처리하는 worker thread가 동일하게 blocking 될 것이고, 위와 같은 기대를 할 수가 없다. 그렇다면 어떻게 throughput과 response time에서 차이가 날 수 있었을까? R2DBC가 Reactor-netty 위에서 Channel과 Event Loop을 통해서 Database와 데이터를 주고 받는 것이 상당히 효율적이기 때문일까? 아직 해결되지 않은 궁금증으로 남게 되었다.
 
-R2DBC를 사용한다면 WebFlux를 사용하는 것이 좋겠지만, Spring MVC에서 R2DBC를 사용해야 된다면 Controller에서 Flux와 Mono를 리턴하도록 작성하는 것이 stream이 끝날때까지 block하는 것보다 바람직하지 않을까 한다.
+R2DBC를 사용한다면 WebFlux를 사용하는 것이 좋겠지만, Spring MVC에서 R2DBC를 사용해야 된다면 Controller에서 Flux와 Mono를 리턴하도록 작성하는 것이 stream이 끝날때까지 block하는 것보다 바람직하지 않을까? 이부분에 대해서 다음에 시간을 내서 테스트 해보면 재미있을 것 같다.
 
 [1]: https://technology.amis.nl/software-development/performance-and-tuning/spring-blocking-vs-non-blocking-r2dbc-vs-jdbc-and-webflux-vs-web-mvc/
 
