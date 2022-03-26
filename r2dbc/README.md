@@ -1,3 +1,22 @@
+- [Spring MVC에서 R2DBC 사용](#spring-mvc에서-r2dbc-사용)
+  - [R2DBC SPI](#r2dbc-spi)
+  - [Driver](#driver)
+  - [Reactor-Netty](#reactor-netty)
+  - [r2dbc-postgresql](#r2dbc-postgresql)
+  - [r2dbc-mysql](#r2dbc-mysql)
+  - [Sample code로 Thread 확인](#sample-code로-thread-확인)
+  - [Performance benchmark 결과 생각해보기](#performance-benchmark-결과-생각해보기)
+    - [Servlet 3.1+](#servlet-31)
+    - [Async Controller](#async-controller)
+    - [Spring Web MVC에서 Flux와 Mono 타입 핸들링](#spring-web-mvc에서-flux와-mono-타입-핸들링)
+      - [JsonEmitterSubscriber](#jsonemittersubscriber)
+      - [DefferedResultSubcriber](#defferedresultsubcriber)
+    - [중간 생각](#중간-생각)
+    - [Performance benchmark code](#performance-benchmark-code)
+  - [Back-pressure](#back-pressure)
+  - [결론](#결론)
+  - [참고자료](#참고자료)
+
 # Spring MVC에서 R2DBC 사용
 
 `Spring Web MVC + JDBC database driver`와 `Spring Web MVC + R2DBC driver`의 Performance 비교<sup>[1][1]</sup>에 관한 글을 보았다. 🤔 **blocking이 되는 Spring Web MVC에서 Non-blocking R2DBC driver를 사용하는 것이 어떠한 이득이 될지 궁금해졌다.**
