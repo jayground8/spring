@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation platform('io.projectreactor:reactor-bom:2020.0.17')
+    implementation 'io.projectreactor.netty:reactor-netty-core'
+//    implementation 'io.projectreactor.netty:reactor-netty-http:1.0.17'
+    implementation 'io.projectreactor:reactor-core:3.4.16'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}
