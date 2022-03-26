@@ -2,7 +2,7 @@
   - [Java NIO](#java-nio)
   - [Netty](#netty)
   - [Inbound 전체적인 과정](#inbound-전체적인-과정)
-  - [Source Code로 더 자세히 발펴보기](#source-code로-더-자세히-발펴보기)
+  - [Source Code로 더 자세히 살펴보기](#source-code로-더-자세히-살펴보기)
   - [Flux](#flux)
   - [Backpressure](#backpressure)
 - [결론](#결론)
@@ -138,7 +138,7 @@ Netty는 Event Loop위에서 Event가 발생하였을 때 해당 handler를 처�
 3. Channel은 Event Loop에 등록이 되어 있어서 read를 통해서 kernel space의 데이터를 user space의 ByteBuf로 가져온다. 기본적으로 Auto Read가 true기 때문에 우리가 명시적으로 Channel read를 하지 않아도 Netty Event Loop에서 읽게 된다. 그리고 이렇게 read가 될 때, onInboundNext를 call이 되어 해당 데이터가 전달된다.
 
 
-## Source Code로 더 자세히 발펴보기
+## Source Code로 더 자세히 살펴보기
 
 Inbound 과정에서 Publisher 역할을 하는 `FluxReceive`와 다양한 Operator를 제공하는 `ByteBufFlux`를 이해해본다.
 
@@ -154,7 +154,7 @@ final class FluxReceive extends Flux<Object> implements Subscription, Disposable
 
 아랫의 주석처럼 `receive()`는 `ByteBufFlux`를 반환하는데, ByteBufFlux가 `source`로 `FluxReceive` 객체를 가지게 된다. `asString()`은 `ByteBufFlux`가 제공하는 operator로 이제 `ByteBuf`에서 메세지를 읽어서 String으로 전달해주는 역할을 한다. 따라서 `asString()` 이후에는 `Flux<String>`이 전달된다.
 
-`subscribe()`를 하면 `ByteBufFlex`의 subscribe가 실행되고 이는 다시 `FluxReceive`의 subscribe를 실행하게 된다.
+`subscribe()`를 하면 `ByteBufFlux`의 subscribe가 실행되고 이는 다시 `FluxReceive`의 subscribe를 실행하게 된다.
 
 ```java
 connection.inbound() // NettyInbound
@@ -333,7 +333,7 @@ Flux<String> flux = Flux.generate(
 flux.subscribe(System.out::println);
 ```
 
-`create`로는 아래와 같이 Flux를 생성할 수 있다. 이제 create의 emitter(sink)로는 여러개의 element를 emit할 수 있고, 비동기적으로도 emit하여 비동기적으로 작동하게 할 수도 있다. `sink` 객체를 저장하고 다른 thread에서 sink.next()를 비동기적으로 실행하도록 할수도 있다.
+`create`로는 아래와 같이 Flux를 생성할 수 있다. 이제 create의 emitter(sink)로는 여러개의 element를 emit할 수 있고, 비동기적으로 작동하게 할 수도 있다. `sink` 객체를 저장하고 다른 thread에서 sink.next()를 비동기적으로 실행하도록 할수도 있다.
 
 ```java
 Flux<Integer> fluxAsync = Flux.create(
@@ -364,7 +364,7 @@ RSocket은 network boundary를 넘어서 reactive stream의 push-pull model을 �
 
 `reactor-netty`는 `reactive stream specification`을 따르는 `reactor project`를 적용하여 쉽게 server와 client를 작성할 수 있다. 
 
-`reactor-netty`에서 어떻게 `reactive stream`을 생성하여 downstream으로 데이터를 전달하는지 코드를 통해서 살펴보았다. 이를 통해서 `reactor-netty`는 TCP flow control 메카니즘에 backpressure를 의존하는 것을 확인할 수 있었다. 따라서 socket buffer가 가득차서 receive window가 0이 된다면 더이상 network상에서 패킷을 보낼 수가 없게 된다. 
+`reactor-netty`에서 어떻게 `reactive stream`을 생성하여 downstream으로 데이터를 전달하는지 코드를 통해서 살펴보았다. 이를 통해서 `reactor-netty`는 TCP flow control 메카니즘에 backpressure를 의존하는 것을 확인할 수 있었다. socket receive buffer가 가득차서 receive window가 0이 된다면 더이상 network상에서 패킷을 보낼 수가 없게 된다. 그러면 데이터를 보내는 쪽에서는 socket send buffer가 가득 찰 수 있다. 보내는 쪽에서는 동기적인 코드에서는 계속해서 block이 될 수 있고, 비동기적인 코드에서는 계속해서 실행이 미뤄질 수 있다. 
 
 그리고 Consumer가 request하는 것과 상관없이 Netty가 Channel에서 읽은 데이터를 Consumer에서 처리하기 전까지 Queue에 쌓아 놓는 것을 알 수 있었다. 따라서 경우에 따라서는 application 단에서 Queue에 계속 쌓이는 데이터에 의해서 out of memory가 발생할 수 있는 가능성이 존재한다는 것을 이해할 수 있었다.
 
