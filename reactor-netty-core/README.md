@@ -267,6 +267,11 @@ final void drainReceiver() {
 					       .setAutoRead(true);
 				}
 			}
+            else if (!needRead) {
+				needRead = true;
+				channel.config()
+				       .setAutoRead(false);
+			}
     }
 }
 ```

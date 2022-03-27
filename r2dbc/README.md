@@ -113,7 +113,7 @@ fun getFlux() : Flux<Cat> {
 }
 ```
 
-`ReactiveTypeHandler`에서 `handleValue` 메소드를 살펴보자. `curl`로 해당 path로 request를 하면 `handleValue` 안에서 아래와 같은 `DeferredResult`를 사용하도록 되어 있다.
+[`ReactiveTypeHandler`](https://github.com/spring-projects/spring-framework/blob/main/spring-webmvc/src/main/java/org/springframework/web/servlet/mvc/method/annotation/ReactiveTypeHandler.java)에서 `handleValue` 메소드를 살펴보자. `curl`로 해당 path로 request를 하면 `handleValue` 안에서 아래와 같은 `DeferredResult`를 사용하도록 되어 있다.
 
 ```java
 DeferredResult<Object> result = new DeferredResult<>();
