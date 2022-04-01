@@ -1,4 +1,4 @@
-# MongoDB Reactive Stream Driver
+# Reactive Stream Push-pull Model With Database
 
 R2DBC driver인 r2dbc-mysql과 r2dbc-postgresql는 reactor-netty의 TcpClient를 사용하여 구현한 것을 확인하였다. 그리고 어떻게 BackPressure이 작동하는지 궁금하여 소스코드를 보면서 작동방식을 확인해보았다.<sup>[1][1]</sup> Reactive Stream의 BackPressure 메카니즘을 통해서 Consumer가 처리할 수 있는 만큼 request n하여 Producer로부터 받아 올 수 있다. 하지만 reactor-netty의 TcpClient는 데이터베이스가 쿼리 결과값은 계속해서 Socket receive buffer에 쌓이게 되고, Channel read가 발생할 때 Queue에 쌓이도록 작동한다. 그리고 최종 Consumer가 요청하는 request n 만큼 Queue에서 가져와서 처리한다. 따라서 실질적으로 Consumer가 요청하는 만큼 Producer(데이터베이스)가 데이터를 전달하는 것이 아니다.
 
