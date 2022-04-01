@@ -371,7 +371,7 @@ RSocket은 network boundary를 넘어서 reactive stream의 push-pull model을 �
 
 `reactor-netty`에서 어떻게 `reactive stream`을 생성하여 downstream으로 데이터를 전달하는지 코드를 통해서 살펴보았다. 이를 통해서 `reactor-netty`는 TCP flow control 메카니즘에 backpressure를 의존하는 것을 확인할 수 있었다. socket receive buffer가 가득차서 receive window가 0이 된다면 더이상 network상에서 패킷을 보낼 수가 없게 된다. 그러면 데이터를 보내는 쪽에서는 socket send buffer가 가득 찰 수 있다. 보내는 쪽에서는 동기적인 코드에서는 계속해서 block이 될 수 있고, 비동기적인 코드에서는 계속해서 실행이 미뤄질 수 있다. 
 
-그리고 Consumer가 request하는 것과 상관없이 Netty가 Channel에서 읽은 데이터를 Consumer에서 처리하기 전까지 Queue에 쌓아 놓는 것을 알 수 있었다. 따라서 경우에 따라서는 application 단에서 Queue에 계속 쌓이는 데이터에 의해서 out of memory가 발생할 수 있는 가능성이 존재한다는 것을 이해할 수 있었다.
+그리고 Consumer가 request하는 것과 상관없이 Netty가 Channel에서 읽은 데이터를 Consumer에서 처리하기 전까지 Queue에 쌓아 놓는 것을 알 수 있었다. 따라서 경우에 따라서는 application 단에서 Queue에 계속 쌓이는 데이터에 의해서 ~~out of memory가 발생~~([How to Avoid Common Mistakes When Using Reactor Netty 발표](https://youtu.be/LLSln1_JAMY) 를 참고하니 ByteBuf가 heap이 아니라 native memory에 할당되는 것 같다.) 할 수 있는 가능성이 존재한다는 것을 이해할 수 있었다.
 
 RSocket은 Network boundary를 넘어서 reactive stream의 push-pull 메카니즘을 적용할수 있는 binary protocol이라는 것을 알게 되었고, 나중에 Rsocket에 대해서도 자세히 알아보면 좋겠다.
 
