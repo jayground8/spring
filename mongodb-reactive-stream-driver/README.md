@@ -105,7 +105,7 @@ Query: select * from person
 
 ## MongoDB
 
-MongoDB에서는 공식적으로 `MongoDB Java Reactive Streams Driver`<sup>[3][3]</sup>를 제공한다. 해당 driver의 Source code<sup>[4][4]</sup>의 BatchCursorFlux에서 아래와 같이 작성되어 있다. MongoDB에서는 `cursor.batchSize(size)`로 설정할 수 있는데, 아랫처럼 Consumer가 요청한 request n 갯수를 통해서 이 batch size를 설정하는 것을 볼 수 있다.
+MongoDB에서는 공식적으로 `MongoDB Java Reactive Streams Driver`<sup>[3][3]</sup>를 제공한다. 해당 driver의 Source code<sup>[4][4]</sup>의 BatchCursorFlux에서 아래와 같이 작성되어 있다. MongoDB에서는 `cursor.batchSize(size)`로 설정할 수 있는데, 아랫처럼 Consumer가 요청한 request n 갯수를 통해서 이 batch size를 설정하는 것을 볼 수 있다. 
 
 BatchCursorFlux.java
 ```java
@@ -139,6 +139,16 @@ public void subscribe(final Subscriber<? super T> subscriber) {
         sink.onDispose(this::closeCursor);
     }, FluxSink.OverflowStrategy.BUFFER)
     .subscribe(subscriber);
+}
+
+int calculateBatchSize(final long demand) {
+    Integer setBatchSize = batchCursorPublisher.getBatchSize();
+    if (setBatchSize != null) {
+        return setBatchSize;
+    } else if (demand > Integer.MAX_VALUE) {
+        return Integer.MAX_VALUE;
+    }
+    return Math.max(2, (int) demand);
 }
 ```
 
