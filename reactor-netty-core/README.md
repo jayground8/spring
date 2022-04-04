@@ -5,6 +5,7 @@
   - [Source Code로 더 자세히 살펴보기](#source-code로-더-자세히-살펴보기)
   - [Flux](#flux)
   - [Backpressure](#backpressure)
+  - [native memory 할당](#native-memory-할당)
 - [결론](#결론)
 
 # reactor-netty
@@ -365,14 +366,22 @@ Netty가 Channel read하는 속도가 느려서 receive buffer가 꽉차게 되�
 
 RSocket은 network boundary를 넘어서 reactive stream의 push-pull model을 제공하는 binary protocol을 제공한다. 따라서 하나의 connection을 multiplexer처럼 공유해서 사용하는데도 유리하다.
 
+## native memory 할당
+
+How to Avoid Common Mistakes When Using Reactor Netty 발표<sup>[1][1]</sup>에서 `reactor-netty`는 socket에서 읽어 올때 heap이 아닌 native memory에 할당하는 것을 알 수 있었다. NIO에서 보면 이제 `ByteBuffer.allocate()`를 통해서 heap에 할당할 수도 있고, `ByteBuffer.allocalteDirect()`를 통해서 native memory에 할당할 수 있다. 이제 I/O 작업에서는 OS 입장에서는 native memory에 접근할 수 있는데, `HeapByteBuffer`를 사용하게 되면 OS에서 접근할 수 있도록 임시적으로 `DirectByteBuffer`에 카피하게 되어 있다.<sup>[2][2]</sup> 🤔 그럼 이제 natvie memory에 할당을 하게 되고 memory를 다 사용하게 되면 어떻게 되는걸까? 이제 기본적으로는 OS에서 memory swapping이 가능하다면 이제 실제 memory보다 더 많이 저장할 수는 있을 것이다. swapping이 불가능하다면 heap 메모리처럼 `out of memory` Exception이 발생할까? JVM heap의 max값을 정하면 기본적으로 max direct memory size도 동일하게 적용된다. 따라서 JVM이 native memory에 사용되는 것을 추척하고 이것도 max값에 의해서 heap과 동일하게 `Out Of Memory` 가 발생하게 된다.
+
 # 결론
 
 `reactor-netty`는 `reactive stream specification`을 따르는 `reactor project`를 적용하여 쉽게 server와 client를 작성할 수 있다. 
 
 `reactor-netty`에서 어떻게 `reactive stream`을 생성하여 downstream으로 데이터를 전달하는지 코드를 통해서 살펴보았다. 이를 통해서 `reactor-netty`는 TCP flow control 메카니즘에 backpressure를 의존하는 것을 확인할 수 있었다. socket receive buffer가 가득차서 receive window가 0이 된다면 더이상 network상에서 패킷을 보낼 수가 없게 된다. 그러면 데이터를 보내는 쪽에서는 socket send buffer가 가득 찰 수 있다. 보내는 쪽에서는 동기적인 코드에서는 계속해서 block이 될 수 있고, 비동기적인 코드에서는 계속해서 실행이 미뤄질 수 있다. 
 
-그리고 Consumer가 request하는 것과 상관없이 Netty가 Channel에서 읽은 데이터를 Consumer에서 처리하기 전까지 Queue에 쌓아 놓는 것을 알 수 있었다. 따라서 경우에 따라서는 application 단에서 Queue에 계속 쌓이는 데이터에 의해서 ~~out of memory가 발생~~([How to Avoid Common Mistakes When Using Reactor Netty 발표](https://youtu.be/LLSln1_JAMY) 를 참고하니 ByteBuf가 heap이 아니라 native memory에 할당되는 것 같다.) 할 수 있는 가능성이 존재한다는 것을 이해할 수 있었다.
+그리고 Consumer가 request하는 것과 상관없이 Netty가 Channel에서 읽은 데이터를 Consumer에서 처리하기 전까지 Queue에 쌓아 놓는 것을 알 수 있었다. 따라서 경우에 따라서는 application 단에서 Queue에 계속 쌓이는 데이터에 의해서 `out of memory`가 발생할 수 있는 가능성이 존재한다는 것을 이해할 수 있었다.
 
 RSocket은 Network boundary를 넘어서 reactive stream의 push-pull 메카니즘을 적용할수 있는 binary protocol이라는 것을 알게 되었고, 나중에 Rsocket에 대해서도 자세히 알아보면 좋겠다.
 
 하지만 R2DBC driver 같은 경우에는 Database에서 RSocket을 사용할 수 있는 Protocol을 제공하지 않기 때문에 옵션이 될 수 없겠다.
+
+[1]: https://youtu.be/LLSln1_JAMY
+
+[2]: https://dzone.com/articles/troubleshooting-problems-with-native-off-heap-memo
