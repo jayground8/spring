@@ -11,3 +11,5 @@
 5. [RSocket는 어떻게 Application Level Flow Control을 하는 것인가?](https://github.com/jayground8/spring/tree/main/rsocket)
 
 6. [Spring Data JPA에서 Stream 객체를 사용하면 어떻게 되는거지?](https://github.com/jayground8/spring/tree/main/spring-data-jpa-stream)
+
+7. [`subscribeOn`과 `publishOn`이 어떻게 작동하는 것인지 이제 그만 헛갈려하자 ](https://github.com/jayground8/spring/tree/main/thread-scheduling-on-reactor)
