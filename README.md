@@ -13,3 +13,5 @@
 6. [Spring Data JPA에서 Stream 객체를 사용하면 어떻게 되는거지?](https://github.com/jayground8/spring/tree/main/spring-data-jpa-stream)
 
 7. [`subscribeOn`과 `publishOn`이 어떻게 작동하는 것인지 이제 그만 헛갈려하자 ](https://github.com/jayground8/spring/tree/main/thread-scheduling-on-reactor)
+
+8. [Project Reactor library가 제공하는 다양한 기능들을 다시 한번 자세히 살펴보자](https://github.com/jayground8/spring/tree/main/operator)
